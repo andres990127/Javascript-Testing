@@ -15,14 +15,15 @@ const fakeBooks = [
     },
 ];
 
-// Se crea una base de datos falsa con todos sus métodos para CRUD
-const MongoLibStub = {
-    getAll: () => [...fakeBooks],
-    create: () => { }
-}
+// Se declara Spy para el servicio 'getAll'
+const mockGetAll = jest.fn();
 
 // Se configura Jest para que utilice la base de datos falsa cuando se ejecuten las pruebas
-jest.mock('../lib/mongo.lib', () => jest.fn().mockImplementation(() => MongoLibStub));
+jest.mock('../lib/mongo.lib', () => jest.fn().mockImplementation(() => ({
+    getAll: mockGetAll,
+    create: () => { },
+})));
+
 
 // Prueba para el servicio BookService
 describe('Test for BookService', () => {
@@ -32,17 +33,32 @@ describe('Test for BookService', () => {
     beforeEach(() => {
         service = new BooksService();
         jest.clearAllMocks();
-    })
+    });
 
-    // Prueba para el servicio que obtiene todos los libros
-    describe('Test for getBooks', () => {
-        test('Should return a list of books', async () => { // AAA
+    // Test para probar el servicio 'getBooks'
+    describe('test for getBooks', () => {
+        test('should return a list book', async () => {
             // Arrange
-
+            mockGetAll.mockResolvedValue(fakeBooks);
             // Act
-            const books = await service.getBooks(); // Se obtienen todos los libros
-            // Asert
-            expect(books.length).toEqual(2); // Se espera que solo vengan 2 ya que esa es la cantidad fake que creamos
-        })
-    })
+            const books = await service.getBooks({});
+            console.log(books);
+            // Assert
+            expect(books.length).toEqual(2); // Se esperan 2 libros ya que eso es lo que tenemos en la data fake
+            expect(mockGetAll).toHaveBeenCalled(); // Se espera que este mockSpy sea llamado 
+            expect(mockGetAll).toHaveBeenCalledTimes(1); // Se espera que este mockSpy sea llamado una vez 
+            expect(mockGetAll).toHaveBeenCalledWith('books', {}); // Se espera que se le llame con el parámetro 'books'
+        });
+
+        // Test para probar que el primer libro se llame 'Harry potter 2'
+        test('should return a list book', async () => {
+            mockGetAll.mockResolvedValue([{ // Se le pasa una data quemada para esta prueba
+                _id: 1,
+                name: 'Harry potter 2',
+            }]);
+            const books = await service.getBooks({});
+            console.log(books);
+            expect(books[0].name).toEqual('Harry potter 2');
+        });
+    });
 })

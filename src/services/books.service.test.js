@@ -1,19 +1,8 @@
 // Ejecutar "npm run test" para correr el test
 
 // Se importa el servicio que vamos a probar
+const { generateManyBook } = require('../fakes/book.fake');
 const BooksService = require('../services/books.service');
-
-// Se crean datos falsos que suponen contenido de la base de datos
-const fakeBooks = [
-    {
-        _id: 1,
-        name: 'Harry Potter',
-    },
-    {
-        _id: 2,
-        name: 'Otro libro',
-    },
-];
 
 // Se declara Spy para el servicio 'getAll'
 const mockGetAll = jest.fn();
@@ -39,26 +28,25 @@ describe('Test for BookService', () => {
     describe('test for getBooks', () => {
         test('should return a list book', async () => {
             // Arrange
-            mockGetAll.mockResolvedValue(fakeBooks);
+            const fakeBooks = generateManyBook(20); // Se generan datos de 20 libros en un array 
+            mockGetAll.mockResolvedValue(fakeBooks); // Se envia la data para la prueba
             // Act
             const books = await service.getBooks({});
             console.log(books);
             // Assert
-            expect(books.length).toEqual(2); // Se esperan 2 libros ya que eso es lo que tenemos en la data fake
+            expect(books.length).toEqual(fakeBooks.length); // Se espera que se obtenga la misma cantidad de libros que se generaron
             expect(mockGetAll).toHaveBeenCalled(); // Se espera que este mockSpy sea llamado 
             expect(mockGetAll).toHaveBeenCalledTimes(1); // Se espera que este mockSpy sea llamado una vez 
             expect(mockGetAll).toHaveBeenCalledWith('books', {}); // Se espera que se le llame con el parámetro 'books'
         });
 
-        // Test para probar que el primer libro se llame 'Harry potter 2'
+        // Test para probar que el primer nombre del libro recibido tenga el nombre del primero libro generado
         test('should return a list book', async () => {
-            mockGetAll.mockResolvedValue([{ // Se le pasa una data quemada para esta prueba
-                _id: 1,
-                name: 'Harry potter 2',
-            }]);
+            const fakeBooks = generateManyBook(4); // Se generan datos de 20 libros en un array 
+            mockGetAll.mockResolvedValue(fakeBooks); // Se envia la data para la prueba
             const books = await service.getBooks({});
             console.log(books);
-            expect(books[0].name).toEqual('Harry potter 2');
+            expect(books[0].name).toEqual(fakeBooks[0].name);
         });
     });
 })

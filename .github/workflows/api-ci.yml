@@ -19,7 +19,7 @@ jobs:
           cache: 'npm'
       - name: Install dependences
         shell: bash
-        run: npm ci
+        run: npm install
       - name: Run unit test
         shell: bash
         run: npm run test

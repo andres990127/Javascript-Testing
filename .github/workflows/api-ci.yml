@@ -4,10 +4,9 @@ on: [push]
 
 defaults:
   run:
-    working-directory: ./
+    working-directory: ./api
 
 jobs:
-
   linter:
     runs-on: ubuntu-latest
     steps:
@@ -15,16 +14,15 @@ jobs:
         uses: actions/checkout@v2
       - name: Setup Nodejs
         uses: actions/setup-node@v2
-        with: 
+        with:
           node-version: 14
           cache: 'npm'
-      - name: Install dependences
+      - name: install
         shell: bash
-        run: npm install
-      - name: Run linter
+        run: npm ci
+      - name: run linter
         shell: bash
         run: npm run lint
-
   unit-test:
     runs-on: ubuntu-latest
     steps:
@@ -32,39 +30,39 @@ jobs:
         uses: actions/checkout@v2
       - name: Setup Nodejs
         uses: actions/setup-node@v2
-        with: 
+        with:
           node-version: 14
           cache: 'npm'
-      - name: Install dependences
+          cache-dependency-path: ./api/package-lock.json
+      - name: install
         shell: bash
-        run: npm install
-      - name: Run unit test
+        run: npm ci
+      - name: run unit test
         shell: bash
         run: npm run test
-
   e2e:
     runs-on: ubuntu-latest
     container:
       image: node:14
+
     services:
       mongo-e2e:
         image: mongo:4.4
-      ports:
-        - 27017:27017
-      env:
-        MONGO_INITDB_ROOT_USERNAME: test
-        MONGO_INITDB_ROOT_PASSWORD: test123
+        ports:
+          - 27017:27017
+        env:
+          MONGO_INITDB_ROOT_USERNAME: test
+          MONGO_INITDB_ROOT_PASSWORD: test123
+
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Install dependences
+      - name: install
         shell: bash
-        run: npm install
-      - name: Run e2e test
+        run: npm ci
+      - name: run e2e
         shell: bash
         run: npm run test:e2e
-        env: 
+        env:
           MONGO_DB_NAME: demo
-          MONGO_URL: mongodb+srv://test:test123@mongo-e2e:27017/?retryWrites=true&w=majority
-    
-
+          MONGO_URL: mongodb://test:test123@mongo-e2e:27017?retryWrites=true&writeConcern=majority

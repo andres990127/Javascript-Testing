@@ -19,7 +19,7 @@ jobs:
           cache: 'npm'
       - name: install
         shell: bash
-        run: npm ci
+        run: npm install
       - name: run linter
         shell: bash
         run: npm run lint
@@ -35,7 +35,7 @@ jobs:
           cache: 'npm'
       - name: install
         shell: bash
-        run: npm ci
+        run: npm install
       - name: run unit test
         shell: bash
         run: npm run test
@@ -58,7 +58,7 @@ jobs:
         uses: actions/checkout@v2
       - name: install
         shell: bash
-        run: npm ci
+        run: npm install
       - name: run e2e
         shell: bash
         run: npm run test:e2e

@@ -1,0 +1,26 @@
+name: API CI
+
+on: [push]
+
+defaults:
+  run:
+    working-directory: ./
+
+jobs:
+  unit-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actiones/checkout@v2
+      - name: Setup Nodejs
+        uses: actiones/setup-node@v2
+        with: 
+          node-version: 14
+          cache: 'npm'
+      - name: Install dependences
+        shell: bash
+        run: npm ci
+      - name: Run unit test
+        shell: bash
+        run: npm run test
+
